@@ -1,4 +1,3 @@
-
 import { TextStreamer } from "@huggingface/transformers";
 
 import type { Generator } from "./runtime";
@@ -35,7 +34,6 @@ export async function generateResponse({
 }: GenerateOptions): Promise<GenerationMetrics> {
   const tokenizer = generator.tokenizer;
 
-  // Count prompt tokens using Qwen's actual chat template.
   const encoded = tokenizer.apply_chat_template(
     messages,
     {
@@ -49,7 +47,6 @@ export async function generateResponse({
 
   let generatedTokens = 0;
 
-  // Streamer converts token IDs into readable text.
   const streamer = new TextStreamer(tokenizer, {
     skip_prompt: true,
     skip_special_tokens: true,
@@ -66,29 +63,24 @@ export async function generateResponse({
 
   const startTime = performance.now();
 
-  // Run actual model generation.
   await generator(messages, {
     max_new_tokens: settings.maxNewTokens,
-
     do_sample: true,
     temperature: settings.temperature,
     top_k: settings.topK,
     top_p: settings.topP,
-
     streamer,
   });
 
   const elapsedMs = performance.now() - startTime;
 
-  const tokensPerSecond =
-    elapsedMs > 0
-      ? generatedTokens / (elapsedMs / 1000)
-      : 0;
-
   return {
     promptTokens,
     generatedTokens,
     elapsedMs,
-    tokensPerSecond,
+    tokensPerSecond:
+      elapsedMs > 0
+        ? generatedTokens / (elapsedMs / 1000)
+        : 0,
   };
 }
