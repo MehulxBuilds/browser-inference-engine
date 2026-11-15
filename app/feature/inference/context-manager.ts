@@ -1,53 +1,42 @@
-import type { ChatMessage } from "../chat/types";
+import type { ChatMessage } from "./tokenizer";
 
 export type ContextOptions = {
   contextWindow: number;
   maxNewTokens: number;
   safetyMargin?: number;
   countTokens: (text: string) => number;
+  render: (messages: ChatMessage[]) => string;
 };
 
 export function buildPromptContext(
   messages: ChatMessage[],
   options: ContextOptions,
 ) {
+  if (!Number.isInteger(options.maxNewTokens) || options.maxNewTokens < 1 || options.maxNewTokens >= options.contextWindow) {
+    throw new Error("Invalid output token budget for this model.");
+  }
   const inputBudget =
     options.contextWindow -
     options.maxNewTokens -
-    (options.safetyMargin ?? 128);
+    (options.safetyMargin ?? 0);
 
   if (inputBudget <= 0) {
     throw new Error("Generation settings leave no room for input.");
   }
 
-  const system = messages.filter((m) => m.role === "system").slice(0, 1);
-  const conversation = messages.filter((m) => m.role !== "system");
-  const current = conversation.at(-1);
-
-  if (!current || current.role !== "user") {
-    throw new Error("Expected the latest message to be from the user.");
+  if (messages.at(-1)?.role !== "user") {
+    throw new Error("The latest message must be from the user.");
   }
-
-  const history = conversation.slice(0, -1);
-  let selected = [...history];
-
-  const render = (items: ChatMessage[]) => [
-    ...system,
-    ...items,
-    current,
-  ].map((m) => `${m.role}: ${m.content}`).join("\n") + "\nassistant:";
-
-  while (selected.length > 0 && options.countTokens(render(selected)) > inputBudget) {
-    // Remove oldest messages; avoid keeping an assistant answer without its user turn.
-    selected = selected.slice(2);
+  let selected = [...messages];
+  while (true) {
+    const prompt = options.render(selected);
+    const tokenCount = options.countTokens(prompt);
+    if (tokenCount <= inputBudget) return { prompt, tokenCount, inputBudget };
+    const oldestUser = selected.findIndex((message) => message.role === "user");
+    const nextUser = selected.findIndex((message, index) => index > oldestUser && message.role === "user");
+    if (oldestUser < 0 || nextUser < 0) throw new Error("Your message exceeds the model's context window.");
+    // Drop an entire old turn, retaining system instructions wherever supplied.
+    selected = selected.filter((message, index) =>
+      index < oldestUser || index >= nextUser || message.role === "system");
   }
-
-  const prompt = render(selected);
-  const tokenCount = options.countTokens(prompt);
-
-  if (tokenCount > inputBudget) {
-    throw new Error("Current message exceeds the available context budget.");
-  }
-
-  return { prompt, tokenCount, inputBudget };
 }
