@@ -1,12 +1,12 @@
 import { pipeline } from "@huggingface/transformers";
 
-import { MODEL_CONFIG } from "./config";
+import { MODEL_CONFIG, getModelConfig, type InferenceDevice } from "./config";
 import type { ModelProgress } from "./types";
 
 export type RuntimeOptions = {
   modelId?: string;
-  device?: typeof MODEL_CONFIG.device;
-  dtype?: typeof MODEL_CONFIG.dtype;
+  device?: InferenceDevice;
+  dtype?: "q4" | "q8" | "fp32";
 
   onProgress?: (progress: ModelProgress) => void;
   onStatus?: (status: string) => void;
@@ -31,7 +31,8 @@ export async function createGenerator(
 ) {
   const modelId = options.modelId ?? MODEL_CONFIG.modelId;
   const device = options.device ?? MODEL_CONFIG.device;
-  const dtype = options.dtype ?? MODEL_CONFIG.dtype;
+  const model = getModelConfig(modelId);
+  const dtype = options.dtype ?? (device === "webgpu" ? model.webgpuDtype : model.wasmDtype);
 
   if (device === "webgpu") {
     options.onStatus?.("Checking WebGPU...");

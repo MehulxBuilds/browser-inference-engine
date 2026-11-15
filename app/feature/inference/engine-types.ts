@@ -12,8 +12,8 @@ export type EngineState =
 
 export type BrowserLLMOptions = {
   modelId?: string;
-  device?: "webgpu";
-  dtype?: "q4";
+  device?: "webgpu" | "wasm";
+  dtype?: "q4" | "q8" | "fp32";
 
   onProgress?: (progress: ModelProgress) => void;
   onStatus?: (status: string) => void;

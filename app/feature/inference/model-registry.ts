@@ -1,27 +1,29 @@
 
 import { ModelRegistry } from "@huggingface/transformers";
 
-import { MODEL_CONFIG } from "./config";
+import { MODEL_CONFIG, getModelConfig, type InferenceDevice } from "./config";
 
 import type {
   ModelInspection,
 } from "./types";
 
-export async function inspectModel(): Promise<ModelInspection> {
+export async function inspectModel(modelId = MODEL_CONFIG.modelId, device: InferenceDevice = MODEL_CONFIG.device): Promise<ModelInspection> {
+  const model = getModelConfig(modelId);
+  const dtype = device === "webgpu" ? model.webgpuDtype : model.wasmDtype;
   const modelOptions = {
-    device: MODEL_CONFIG.device,
-    dtype: MODEL_CONFIG.dtype,
+    device,
+    dtype,
   };
 
   // 1. Discover available precision variants.
   const availableDtypes =
     await ModelRegistry.get_available_dtypes(
-      MODEL_CONFIG.modelId,
+      modelId,
     );
 
-  if (!availableDtypes.includes(MODEL_CONFIG.dtype)) {
+  if (!availableDtypes.includes(dtype)) {
     throw new Error(
-      `Requested dtype ${MODEL_CONFIG.dtype} is unavailable. ` +
+      `Requested dtype ${dtype} is unavailable. ` +
       `Available dtypes: ${availableDtypes.join(", ")}`,
     );
   }
@@ -29,14 +31,14 @@ export async function inspectModel(): Promise<ModelInspection> {
   // 2. Discover required model files.
   const files = await ModelRegistry.get_pipeline_files(
     MODEL_CONFIG.task,
-    MODEL_CONFIG.modelId,
+    modelId,
     modelOptions,
   );
 
   // 3. Check whether the required files are cached.
   const cached = await ModelRegistry.is_pipeline_cached(
     MODEL_CONFIG.task,
-    MODEL_CONFIG.modelId,
+    modelId,
     modelOptions,
   );
 
@@ -44,7 +46,7 @@ export async function inspectModel(): Promise<ModelInspection> {
   const metadata = await Promise.all(
     files.map((file) =>
       ModelRegistry.get_file_metadata(
-        MODEL_CONFIG.modelId,
+        modelId,
         file,
       ),
     ),
