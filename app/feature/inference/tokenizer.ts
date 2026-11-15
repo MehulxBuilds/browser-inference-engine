@@ -1,5 +1,7 @@
 
 import type { Generator } from "./runtime";
+import { getModelConfig } from "./config";
+import { renderPrompt } from "./prompt";
 
 export type ChatMessage = {
     role: "system" | "user" | "assistant";
@@ -12,41 +14,28 @@ export type TokenizationResult = {
     tokenCount: number;
 };
 
-export function inspectTokenizer(generator: Generator) {
+export function inspectTokenizer(generator: Generator, modelId?: string) {
     const tokenizer = generator.tokenizer;
     const vocabularySize = tokenizer.get_vocab().size;
 
     return {
         vocabularySize,
-        chatTemplate: tokenizer.get_chat_template(),
+        chatTemplate: getModelConfig(modelId).chatTemplate ? tokenizer.get_chat_template() : "",
     };
 }
 
 export function tokenizeConversation(
     generator: Generator,
     messages: ChatMessage[],
+    modelId?: string,
 ): TokenizationResult {
     const tokenizer = generator.tokenizer;
 
     // First inspect the human-readable formatted prompt.
-    const formattedPrompt = tokenizer.apply_chat_template(
-        messages,
-        {
-            tokenize: false,
-            add_generation_prompt: true,
-        },
-    ) as string;
+    const formattedPrompt = renderPrompt(tokenizer, messages, getModelConfig(modelId).chatTemplate);
 
     // Apply the same template and convert directly to IDs.
-    const encoded = tokenizer.apply_chat_template(
-        messages,
-        {
-            tokenize: true,
-            add_generation_prompt: true,
-            return_tensor: false,
-            return_dict: false,
-        },
-    );
+    const encoded = tokenizer.encode(formattedPrompt, { add_special_tokens: false });
 
     const tokenIds = Array.from(encoded);
 

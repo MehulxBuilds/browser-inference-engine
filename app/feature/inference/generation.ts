@@ -2,6 +2,8 @@ import { TextStreamer } from "@huggingface/transformers";
 
 import type { Generator } from "./runtime";
 import type { ChatMessage } from "./tokenizer";
+import { getModelConfig } from "./config";
+import { preparePrompt } from "./prompt";
 
 export type GenerationOptions = {
   maxNewTokens: number;
@@ -23,6 +25,7 @@ type GenerateOptions = {
   settings: GenerationOptions;
   onText: (text: string) => void;
   onTokenCount?: (count: number) => void;
+  modelId?: string;
 };
 
 export async function generateResponse({
@@ -31,19 +34,12 @@ export async function generateResponse({
   settings,
   onText,
   onTokenCount,
+  modelId,
 }: GenerateOptions): Promise<GenerationMetrics> {
   const tokenizer = generator.tokenizer;
 
-  const encoded = tokenizer.apply_chat_template(
-    messages,
-    {
-      tokenize: true,
-      add_generation_prompt: true,
-      return_tensor: false,
-    },
-  );
-
-  const promptTokens = encoded.input_ids.length;
+  const prompt = preparePrompt(tokenizer, messages, getModelConfig(modelId), settings.maxNewTokens);
+  const promptTokens = tokenizer.encode(prompt, { add_special_tokens: false }).length;
 
   let generatedTokens = 0;
 
@@ -63,10 +59,11 @@ export async function generateResponse({
 
   const startTime = performance.now();
 
-  await generator(messages, {
+  await generator(prompt, {
     max_new_tokens: settings.maxNewTokens,
-    do_sample: true,
-    temperature: settings.temperature,
+    do_sample: settings.temperature > 0,
+    ...(settings.temperature > 0 ? { temperature: settings.temperature } : {}),
+    add_special_tokens: false,
     top_k: settings.topK,
     top_p: settings.topP,
     streamer,

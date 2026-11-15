@@ -85,13 +85,14 @@ export class BrowserLLM {
   }
 
   inspectTokenizer() {
-    return inspectTokenizer(this.getGenerator());
+    return inspectTokenizer(this.getGenerator(), this.options.modelId);
   }
 
   tokenize(messages: ChatMessage[]) {
     return tokenizeConversation(
       this.getGenerator(),
       messages,
+      this.options.modelId,
     );
   }
 
@@ -121,6 +122,7 @@ export class BrowserLLM {
     try {
       return await generateResponse({
         generator: this.getGenerator(),
+        modelId: this.options.modelId,
         messages,
         settings: {
           ...DEFAULT_GENERATION_SETTINGS,
