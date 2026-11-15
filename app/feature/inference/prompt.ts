@@ -6,7 +6,7 @@ export function renderPrompt(tokenizer: PreTrainedTokenizer, messages: ChatMessa
   if (chatTemplate) {
     return tokenizer.apply_chat_template(messages, { tokenize: false, add_generation_prompt: true });
   }
-  // GPT-2 is a completion model; a single turn continues the user's text.
+  // Completion models continue the user's text without a chat template.
   if (messages.length === 1 && messages[0].role === "user") return messages[0].content;
   return messages.map((message) => `${message.role}: ${message.content}`).join("\n") + "\nassistant:";
 }

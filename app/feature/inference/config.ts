@@ -8,38 +8,38 @@ export const SUPPORTED_MODELS = [{
   contextWindowTokens: 32768,
   chatTemplate: true,
 }, {
-  label: "GPT-2 (text completion)",
-  modelId: "onnx-community/gpt2-ONNX",
+  label: "SmolLM2 360M Instruct",
+  modelId: "onnx-community/SmolLM2-360M-Instruct-ONNX",
   task: "text-generation" as const,
-  webgpuDtype: "fp32" as const,
-  wasmDtype: "q8" as const,
-  maxNewTokens: 256,
-  contextWindowTokens: 1024,
-  chatTemplate: false,
-}, {
-  label: "SmolLM2 135M (lightweight chat)",
-  modelId: "onnx-community/SmolLM2-135M-Instruct-ONNX",
-  task: "text-generation" as const,
-  webgpuDtype: "q4" as const,
+  webgpuDtype: "q8" as const,
   wasmDtype: "q8" as const,
   maxNewTokens: 256,
   contextWindowTokens: 8192,
   chatTemplate: true,
 }, {
-  label: "DistilGPT-2 (lightweight completion)",
-  modelId: "onnx-community/distilgpt2-ONNX",
+  label: "SmolLM 360M Instruct",
+  modelId: "HuggingFaceTB/SmolLM-360M-Instruct",
   task: "text-generation" as const,
-  webgpuDtype: "fp32" as const,
+  webgpuDtype: "q8" as const,
   wasmDtype: "q8" as const,
   maxNewTokens: 256,
-  contextWindowTokens: 1024,
-  chatTemplate: false,
+  contextWindowTokens: 2048,
+  chatTemplate: true,
+}, {
+  label: "Llama 3.2 1B Instruct (Meta)",
+  modelId: "onnx-community/Llama-3.2-1B-Instruct-ONNX",
+  task: "text-generation" as const,
+  webgpuDtype: "q4" as const,
+  wasmDtype: "q8" as const,
+  maxNewTokens: 256,
+  contextWindowTokens: 131072,
+  chatTemplate: true,
 }];
 
 export const MODEL_CONFIG = {
-  ...SUPPORTED_MODELS[1],
+  ...SUPPORTED_MODELS[0],
   device: "webgpu" as const,
-  dtype: "fp32" as const,
+  dtype: SUPPORTED_MODELS[0].webgpuDtype,
 };
 
 export function getModelConfig(modelId = MODEL_CONFIG.modelId) {

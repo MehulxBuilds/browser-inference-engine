@@ -16,7 +16,7 @@ const tokenizer = new PreTrainedTokenizer({
   chat_template: "{% for message in messages %}{{ message['role'] }}: {{ message['content'] }}\n{% endfor %}{% if add_generation_prompt %}assistant:{% endif %}",
 });
 
-test("GPT-2 continues raw user text without requiring a chat template", () => {
+test("completion formatting continues raw user text without requiring a chat template", () => {
   assert.equal(renderPrompt(tokenizer, [{ role: "user", content: "hello" }], false), "hello");
 });
 
@@ -27,7 +27,7 @@ test("chat models render the tokenizer's template and assistant prefix", () => {
 });
 
 test("context trimming removes complete old turns and preserves current input", () => {
-  const model = { ...getModelConfig("onnx-community/gpt2-ONNX"), contextWindowTokens: 6 };
+  const model = { ...getModelConfig(), chatTemplate: false, contextWindowTokens: 6 };
   const prompt = preparePrompt(tokenizer, [
     { role: "user", content: "hello hello hello hello" },
     { role: "assistant", content: "hello hello hello hello" },
