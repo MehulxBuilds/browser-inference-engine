@@ -4,7 +4,14 @@ import type { getModelConfig } from "./config";
 
 export function renderPrompt(tokenizer: PreTrainedTokenizer, messages: ChatMessage[], chatTemplate: boolean) {
   if (chatTemplate) {
-    return tokenizer.apply_chat_template(messages, { tokenize: false, add_generation_prompt: true });
+    const templateOptions = {
+      tokenize: false as const,
+      add_generation_prompt: true,
+      // Qwen3 supports direct answers without a separate thinking phase.
+      // Templates for models without thinking support ignore this option.
+      enable_thinking: false,
+    };
+    return tokenizer.apply_chat_template(messages, templateOptions);
   }
   // Completion models continue the user's text without a chat template.
   if (messages.length === 1 && messages[0].role === "user") return messages[0].content;

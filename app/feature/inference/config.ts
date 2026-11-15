@@ -8,22 +8,22 @@ export const SUPPORTED_MODELS = [{
   contextWindowTokens: 32768,
   chatTemplate: true,
 }, {
-  label: "SmolLM2 360M Instruct",
-  modelId: "onnx-community/SmolLM2-360M-Instruct-ONNX",
+  label: "Qwen3 0.6B (Optimized)",
+  modelId: "onnx-community/Qwen3-0.6B-ONNX-OPT",
   task: "text-generation" as const,
-  webgpuDtype: "q8" as const,
+  webgpuDtype: "q4" as const,
   wasmDtype: "q8" as const,
   maxNewTokens: 256,
-  contextWindowTokens: 8192,
+  contextWindowTokens: 40960,
   chatTemplate: true,
 }, {
-  label: "SmolLM 360M Instruct",
-  modelId: "HuggingFaceTB/SmolLM-360M-Instruct",
+  label: "Qwen2.5-Coder 0.5B Instruct",
+  modelId: "onnx-community/Qwen2.5-Coder-0.5B-Instruct",
   task: "text-generation" as const,
   webgpuDtype: "q8" as const,
   wasmDtype: "q8" as const,
   maxNewTokens: 256,
-  contextWindowTokens: 2048,
+  contextWindowTokens: 32768,
   chatTemplate: true,
 }, {
   label: "Llama 3.2 1B Instruct (Meta)",
@@ -37,9 +37,9 @@ export const SUPPORTED_MODELS = [{
 }];
 
 export const MODEL_CONFIG = {
-  ...SUPPORTED_MODELS[0],
+  ...SUPPORTED_MODELS[1],
   device: "webgpu" as const,
-  dtype: SUPPORTED_MODELS[0].webgpuDtype,
+  dtype: SUPPORTED_MODELS[1].webgpuDtype,
 };
 
 export function getModelConfig(modelId = MODEL_CONFIG.modelId) {
