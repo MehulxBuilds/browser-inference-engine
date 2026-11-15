@@ -1,5 +1,6 @@
 
 import { ModelRegistry } from "@huggingface/transformers";
+import { configureInferenceCache } from "./cache-config";
 
 import { MODEL_CONFIG, getModelConfig, type InferenceDevice } from "./config";
 
@@ -8,6 +9,7 @@ import type {
 } from "./types";
 
 export async function inspectModel(modelId = MODEL_CONFIG.modelId, device: InferenceDevice = MODEL_CONFIG.device): Promise<ModelInspection> {
+  configureInferenceCache();
   const model = getModelConfig(modelId);
   const dtype = device === "webgpu" ? model.webgpuDtype : model.wasmDtype;
   const modelOptions = {

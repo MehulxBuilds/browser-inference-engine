@@ -42,3 +42,17 @@ test("rejects oversized current input and invalid output budgets", () => {
   assert.throws(() => preparePrompt(tokenizer, [{ role: "user", content: "hello" }], model, 6), /budget/);
   assert.throws(() => preparePrompt(tokenizer, [{ role: "assistant", content: "" }], model, 2), /latest message/);
 });
+
+test("context trimming preserves system instructions and does not mutate history", () => {
+  const model = { ...getModelConfig(), contextWindowTokens: 15 };
+  const messages = [
+    { role: "system" as const, content: "hello" },
+    { role: "user" as const, content: "hello ".repeat(20) },
+    { role: "assistant" as const, content: "hello" },
+    { role: "user" as const, content: "hello" },
+  ];
+  const prompt = preparePrompt(tokenizer, messages, model, 2);
+  assert.match(prompt, /^system: hello\nuser: hello\nassistant:$/);
+  assert.equal(messages.length, 4);
+  assert.equal(messages[1].content, "hello ".repeat(20));
+});

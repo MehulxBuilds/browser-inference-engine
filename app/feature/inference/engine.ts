@@ -1,4 +1,6 @@
 import { createGenerator } from "./runtime";
+import { InterruptableStoppingCriteria, StoppingCriteriaList } from "@huggingface/transformers";
+import { getModelConfig } from "./config";
 import type { Generator } from "./runtime";
 
 import { generateResponse } from "./generation";
@@ -23,8 +25,8 @@ import type {
 const DEFAULT_GENERATION_SETTINGS: GenerationOptions = {
   maxNewTokens: 256,
   temperature: 0.7,
-  topK: 40,
-  topP: 0.9,
+  topK: 50,
+  topP: 1,
 };
 
 export class BrowserLLM {
@@ -33,6 +35,7 @@ export class BrowserLLM {
   private state: EngineState = "idle";
 
   private generationInProgress = false;
+  private stopping: InterruptableStoppingCriteria | null = null;
 
   private constructor(
     private readonly options: BrowserLLMOptions,
@@ -117,15 +120,24 @@ export class BrowserLLM {
     }
 
     this.generationInProgress = true;
+    const stopping = new InterruptableStoppingCriteria();
+    this.stopping = stopping;
+    const criteria = new StoppingCriteriaList();
+    criteria.push(stopping);
     this.setState("generating");
 
     try {
       return await generateResponse({
         generator: this.getGenerator(),
         modelId: this.options.modelId,
+        device: this.options.device,
+        dtype: this.options.dtype,
+        stoppingCriteria: criteria,
+        isCancelled: () => stopping.interrupted,
         messages,
         settings: {
           ...DEFAULT_GENERATION_SETTINGS,
+          maxNewTokens: getModelConfig(this.options.modelId).maxNewTokens,
           ...settings,
         },
         onText,
@@ -133,13 +145,18 @@ export class BrowserLLM {
       });
     } finally {
       this.generationInProgress = false;
+      this.stopping = null;
 
       // dispose() rejects calls while generation is running.
       this.setState("ready");
     }
   }
 
-  dispose() {
+  stop() {
+    this.stopping?.interrupt();
+  }
+
+  async dispose() {
     if (this.state === "disposed") {
       return;
     }
@@ -150,9 +167,9 @@ export class BrowserLLM {
       );
     }
 
-    this.generator?.dispose();
+    const generator = this.generator;
     this.generator = null;
-
     this.setState("disposed");
+    await generator?.dispose();
   }
 }

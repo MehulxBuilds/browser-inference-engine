@@ -2,6 +2,7 @@ import { pipeline } from "@huggingface/transformers";
 
 import { MODEL_CONFIG, getModelConfig, type InferenceDevice } from "./config";
 import type { ModelProgress } from "./types";
+import { configureInferenceCache } from "./cache-config";
 
 export type RuntimeOptions = {
   modelId?: string;
@@ -29,6 +30,7 @@ async function checkWebGPU() {
 export async function createGenerator(
   options: RuntimeOptions = {},
 ) {
+  configureInferenceCache();
   const modelId = options.modelId ?? MODEL_CONFIG.modelId;
   const device = options.device ?? MODEL_CONFIG.device;
   const model = getModelConfig(modelId);

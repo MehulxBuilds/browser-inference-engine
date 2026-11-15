@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { ChatController } from "../use-chat";
 import { ResponsePerformance } from "./response-performance";
+import { AssistantMarkdown } from "./assistant-markdown";
 
 type Props = Pick<ChatController, "activeConversation" | "isModelReady" | "loadModel" | "loading" | "error">;
 
@@ -35,7 +36,11 @@ export function MessageList({ activeConversation, isModelReady, loadModel, loadi
             ) : (activeConversation?.messages ?? []).map((message) => (
                 <article key={message.id} className={`craft-message ${message.role === "user" ? "craft-message-user" : "craft-message-assistant"}`}>
                     <div className="craft-label mb-2">{message.role === "user" ? "YOU" : message.role.toUpperCase()}</div>
-                    <div className="whitespace-pre-wrap">{message.content || (message.status === "streaming" ? <span className="animate-pulse text-zinc-500">Thinking…</span> : "")}</div>
+                    {message.content ? (
+                        message.role === "assistant"
+                            ? <AssistantMarkdown content={message.content} />
+                            : <div className="whitespace-pre-wrap">{message.content}</div>
+                    ) : message.status === "streaming" ? <span className="animate-pulse text-zinc-500">Thinking…</span> : null}
                     {message.role === "assistant" && message.benchmark && <ResponsePerformance benchmark={message.benchmark} />}
                 </article>
             ))}
