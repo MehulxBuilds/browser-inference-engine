@@ -1,19 +1,105 @@
 @import "tailwindcss";
 
-.craft-performance-button { display: block; margin-top: 10px; padding: 3px 0; color: #9797ff; font: 10px ui-monospace, monospace; }
-.craft-performance-button:hover { color: #c4c4ff; text-decoration: underline; }
-.craft-performance-dialog { width: min(480px, calc(100vw - 28px)); max-height: calc(100dvh - 40px); margin: auto; padding: 20px; border: 2px solid #3d3d3d; background: #141414; color: #eee; box-shadow: 6px 6px #0009; overflow-y: auto; font: 13px var(--font-sans); }
-.craft-performance-dialog::backdrop { background: #000b; }
-.craft-performance-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.craft-performance-heading h2 { font-size: 12px; }
-.craft-performance-heading button { display: grid; place-items: center; width: 36px; height: 36px; flex-shrink: 0; font-size: 24px; color: #aaa; }
-.craft-performance-model { color: #999; font-size: 12px; margin: 4px 0 20px; overflow-wrap: anywhere; }
-.craft-performance-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; border: 1px solid #333; background: #333; }
-.craft-performance-grid > div { padding: 12px; background: #191919; }
-.craft-performance-grid dt { font-size: 10px; color: #999; }
-.craft-performance-grid dd { margin-top: 6px; color: #eee; font: 13px ui-monospace, monospace; overflow-wrap: anywhere; }
-.craft-performance-note { margin-top: 16px; color: #888; font-size: 11px; line-height: 1.7; }
-@media (pointer: coarse) { .craft-performance-button { min-height: 44px; } .craft-performance-heading button { width: 44px; height: 44px; } }
+.craft-performance-button {
+  display: block;
+  margin-top: 10px;
+  padding: 3px 0;
+  color: #9797ff;
+  font: 10px ui-monospace, monospace;
+}
+
+.craft-performance-button:hover {
+  color: #c4c4ff;
+  text-decoration: underline;
+}
+
+.craft-performance-dialog {
+  width: min(480px, calc(100vw - 28px));
+  max-height: calc(100dvh - 40px);
+  margin: auto;
+  padding: 20px;
+  border: 2px solid #3d3d3d;
+  background: #141414;
+  color: #eee;
+  box-shadow: 6px 6px #0009;
+  overflow-y: auto;
+  font: 13px var(--font-sans);
+}
+
+.craft-performance-dialog::backdrop {
+  background: #000b;
+}
+
+.craft-performance-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.craft-performance-heading h2 {
+  font-size: 12px;
+}
+
+.craft-performance-heading button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  font-size: 24px;
+  color: #aaa;
+}
+
+.craft-performance-model {
+  color: #999;
+  font-size: 12px;
+  margin: 4px 0 20px;
+  overflow-wrap: anywhere;
+}
+
+.craft-performance-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  border: 1px solid #333;
+  background: #333;
+}
+
+.craft-performance-grid>div {
+  padding: 12px;
+  background: #191919;
+}
+
+.craft-performance-grid dt {
+  font-size: 10px;
+  color: #999;
+}
+
+.craft-performance-grid dd {
+  margin-top: 6px;
+  color: #eee;
+  font: 13px ui-monospace, monospace;
+  overflow-wrap: anywhere;
+}
+
+.craft-performance-note {
+  margin-top: 16px;
+  color: #888;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+@media (pointer: coarse) {
+  .craft-performance-button {
+    min-height: 44px;
+  }
+
+  .craft-performance-heading button {
+    width: 44px;
+    height: 44px;
+  }
+}
 
 @theme {
   --color-primary: #2020ff;
@@ -558,14 +644,22 @@ input[type="range"] {
   overflow-wrap: anywhere;
 }
 
-.craft-markdown > :first-child { margin-top: 0; }
-.craft-markdown > :last-child { margin-bottom: 0; }
+.craft-markdown> :first-child {
+  margin-top: 0;
+}
+
+.craft-markdown> :last-child {
+  margin-bottom: 0;
+}
+
 .craft-markdown p,
 .craft-markdown ul,
 .craft-markdown ol,
 .craft-markdown blockquote,
 .craft-markdown pre,
-.craft-markdown-table { margin: 0.65em 0; }
+.craft-markdown-table {
+  margin: 0.65em 0;
+}
 
 .craft-markdown :is(h1, h2, h3, h4, h5, h6) {
   margin: 1em 0 0.4em;
@@ -573,20 +667,73 @@ input[type="range"] {
   font-weight: 700;
   line-height: 1.4;
 }
-.craft-markdown h1 { font-size: 1.35em; }
-.craft-markdown h2 { font-size: 1.2em; }
-.craft-markdown :is(h3, h4, h5, h6) { font-size: 1.05em; }
-.craft-markdown strong { font-weight: 700; }
-.craft-markdown ul { list-style: disc; padding-left: 1.5em; }
-.craft-markdown ol { list-style: decimal; padding-left: 1.5em; }
-.craft-markdown li { margin: 0.2em 0; }
-.craft-markdown li > :is(ul, ol, p) { margin: 0.25em 0; }
-.craft-markdown .contains-task-list { list-style: none; padding-left: 0; }
-.craft-markdown input[type="checkbox"] { margin-right: 0.5em; accent-color: #2020ff; }
-.craft-markdown a { color: #a3a3ff; text-decoration: underline; text-underline-offset: 3px; }
-.craft-markdown blockquote { border-left: 3px solid #555; padding-left: 12px; color: #aaa; }
-.craft-markdown code { font-family: ui-monospace, monospace; font-size: 0.9em; }
-.craft-markdown :not(pre) > code { padding: 2px 4px; background: #242424; }
+
+.craft-markdown h1 {
+  font-size: 1.35em;
+}
+
+.craft-markdown h2 {
+  font-size: 1.2em;
+}
+
+.craft-markdown :is(h3, h4, h5, h6) {
+  font-size: 1.05em;
+}
+
+.craft-markdown strong {
+  font-weight: 700;
+}
+
+.craft-markdown ul {
+  list-style: disc;
+  padding-left: 1.5em;
+}
+
+.craft-markdown ol {
+  list-style: decimal;
+  padding-left: 1.5em;
+}
+
+.craft-markdown li {
+  margin: 0.2em 0;
+}
+
+.craft-markdown li> :is(ul, ol, p) {
+  margin: 0.25em 0;
+}
+
+.craft-markdown .contains-task-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.craft-markdown input[type="checkbox"] {
+  margin-right: 0.5em;
+  accent-color: #2020ff;
+}
+
+.craft-markdown a {
+  color: #a3a3ff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.craft-markdown blockquote {
+  border-left: 3px solid #555;
+  padding-left: 12px;
+  color: #aaa;
+}
+
+.craft-markdown code {
+  font-family: ui-monospace, monospace;
+  font-size: 0.9em;
+}
+
+.craft-markdown :not(pre)>code {
+  padding: 2px 4px;
+  background: #242424;
+}
+
 .craft-markdown pre {
   max-width: 100%;
   overflow-x: auto;
@@ -596,14 +743,48 @@ input[type="range"] {
   white-space: pre;
   overflow-wrap: normal;
 }
-.craft-markdown pre code { padding: 0; background: transparent; }
-.craft-markdown-table { max-width: 100%; overflow-x: auto; }
-.craft-markdown table { width: 100%; border-collapse: collapse; }
-.craft-markdown :is(th, td) { border: 1px solid #383838; padding: 6px 10px; text-align: start; }
-.craft-markdown th { background: #202020; font-weight: 600; }
-.craft-markdown hr { margin: 1em 0; border: 0; border-top: 1px solid #383838; }
-.craft-markdown img { max-width: 100%; height: auto; }
-.craft-markdown :is(a, pre, .craft-markdown-table):focus-visible { outline: 2px solid #9696ff; outline-offset: 2px; }
+
+.craft-markdown pre code {
+  padding: 0;
+  background: transparent;
+}
+
+.craft-markdown-table {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.craft-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.craft-markdown :is(th, td) {
+  border: 1px solid #383838;
+  padding: 6px 10px;
+  text-align: start;
+}
+
+.craft-markdown th {
+  background: #202020;
+  font-weight: 600;
+}
+
+.craft-markdown hr {
+  margin: 1em 0;
+  border: 0;
+  border-top: 1px solid #383838;
+}
+
+.craft-markdown img {
+  max-width: 100%;
+  height: auto;
+}
+
+.craft-markdown :is(a, pre, .craft-markdown-table):focus-visible {
+  outline: 2px solid #9696ff;
+  outline-offset: 2px;
+}
 
 .craft-error {
   padding: 16px;
